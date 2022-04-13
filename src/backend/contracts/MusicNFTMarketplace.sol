@@ -20,6 +20,13 @@ contract MusicNFTMarketplace is ERC721("DAppiFy", "FY"), Ownable {
 
     MarketItem[] public marketItems;
 
+    event MarketItemBought(
+        uint256 indexed tokenId,
+        address indexed seller,
+        address buyer,
+        uint256 price
+    );
+
     constructor (
         uint256 _royaltyFee,
         address _artist,
@@ -53,6 +60,7 @@ contract MusicNFTMarketplace is ERC721("DAppiFy", "FY"), Ownable {
         marketItems[_tokenId].seller = payable(address(0));
         payable(artist).transfer(royaltyFee);
         payable(seller).transfer(msg.value);
+        emit MarketItemBought(_tokenId, seller, msg.sender, price);
     }
 
 

@@ -55,4 +55,16 @@ describe("MusicNFTMarketplace", function () {
             expect(await ethers.provider.getBalance(nftMarketplace.address)).to.equal(deploymentFees);
         });
     });
+
+    describe("Updating royalty fee", function () {
+        it("Only deployer sould be able to update royaltyFee", async function () {
+            //creating a variable that contains the new royaltyFee price
+            const newFee = toWei(0.02);
+            await nftMarketplace.updateRoyaltyFee(newFee);
+            await expect(
+                nftMarketplace.connect(user1).updateRoyaltyFee(newFee)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+            expect(await nftMarketplace.royaltyFee()).to.equal(newFee);
+        });
+    });
 })

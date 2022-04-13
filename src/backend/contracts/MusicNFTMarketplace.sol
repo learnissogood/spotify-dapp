@@ -43,5 +43,17 @@ contract MusicNFTMarketplace is ERC721("DAppiFy", "FY"), Ownable {
         royaltyFee = _royaltyFee;
     }
 
+    function buyToken(uint256 _tokenId) external payable {
+        uint256 price = marketItems[_tokenId].price;
+        address seller = marketItems[_tokenId].seller;
+        require(
+            msg.value == price,
+            "Please send the asking price in order to complete the purchase"
+        );
+        marketItems[_tokenId].seller = payable(address(0));
+        payable(artist).transfer(royaltyFee);
+        payable(seller).transfer(msg.value);
+    }
+
 
 }

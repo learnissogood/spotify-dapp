@@ -131,8 +131,13 @@ describe("MusicNFTMarketplace", function () {
             expect(item.price).to.equal(resalePrice);
         });
 
-        it("Should fail if price is set  to zero and royaltyFee is not paid", async function () {
-
+        it("Should fail if price is set to zero and royaltyFee is not paid", async function () {
+            await expect(
+                nftMarketplace.connect(user1).resellToken(0, 0, { value: royaltyFee })
+            ).to.be.revertedWith("Price must be greater than zero");
+            await expect(
+                nftMarketplace.connect(user1).resellToken(0, toWei(1), { value: 0 })
+            ).to.be.revertedWith("Must pay royalty");
         });
     });
 })

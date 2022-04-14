@@ -101,4 +101,38 @@ describe("MusicNFTMarketplace", function () {
             ).to.be.revertedWith("Please send the asking price in order to complete the purchase");
         });
     });
+
+    describe("Reselling Tokens", function () {
+        beforeEach(async function () {
+            //User1 purchase an item
+            await nftMarketplace.connect(user1).buyToken(0, { value: prices[0] });
+        });
+
+        it("Should track resale item, incr. ether bal by royaltyFee, transfer NFT to marketplace and emit MarketItemRelisted event", async function () {
+            const resalePrice = toWei(2);
+            const initialMarketBal = await ethers.provider.getBalance(nftMarketplace.address);
+            //User1 lists the NFT for a price of 2 hoping to flip it and double ther money
+            await expect(nftMarketplace.connect(user1).resellToken(0, resalePrice, { value: royaltyFee}))
+            .to.emit(nftMarketplace, "MarketItemRelisted")
+            .withArgs(
+                0,
+                user1.address,
+                resalePrice
+            )
+            const finalMarketBal = await ethers.provider.getBalance(nftMarketplace.address);
+            //Expect final market balance to equal initialBal + royaltyFee
+            expect(+fromWei(finalMarketBal)).to.equal(+fromWei(initialMarketBal) + +fromWei(royaltyFee));
+            //Expect owner of NFT should now be the marketplace
+            expect(await nftMarketplace.ownerOf(0)).to.equal(nftMarketplace.address);
+            //Checking fields of struct should be change
+            const item = await nftMarketplace.marketItems(0);
+            expect(item.tokenId).to.equal(0);
+            expect(item.seller).to.equal(user1.address);
+            expect(item.price).to.equal(resalePrice);
+        });
+
+        it("Should fail if price is set  to zero and royaltyFee is not paid", async function () {
+
+        });
+    });
 })

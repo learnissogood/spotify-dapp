@@ -174,6 +174,5 @@ describe("MusicNFTMarketplace", function () {
             expect(myItems.every(i => ownedByUser2.some(j => j === i.tokenId.toNumber()))).to.equal(true);
             expect(ownedByUser2.length === myItems.length).to.equal(true);
         });
-
     });
 })
